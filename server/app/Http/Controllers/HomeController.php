@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -21,8 +22,16 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('home');
+        $user = $request->user();
+
+        if ($user) {
+            // 重整頁面時，隨機更新頭像
+            $user->avatar = sprintf("https://avatars.dicebear.com/api/human/%s.svg", Str::random(10));
+            $user->save();
+        }
+
+        return view('home', ['user' => $user]);
     }
 }

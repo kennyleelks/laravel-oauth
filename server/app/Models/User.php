@@ -21,6 +21,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+
+        // 使這個欄位可以被寫入
+        'avatar',
     ];
 
     /**
@@ -41,18 +44,4 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-
-    /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array
-     */
-    protected $appends = ['avatar'];
-
-    /**
-     * 回傳大頭照
-     */
-    public function getAvatarAttribute() {
-        return sprintf("https://avatars.dicebear.com/api/human/%s.svg", $this->id);
-    }
 }

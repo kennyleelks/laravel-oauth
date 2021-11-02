@@ -25,20 +25,34 @@ class HomeController extends Controller
      */
     public function index(Request $request)
     {
-        if ($user = $request->user()) {
-            if (empty($user->avatar) && !empty($user->access_token)) {
-                // 取得大頭照
-            }
+        return view('home', ['user' => $request->user()]);
+    }
+
+    /**
+     * 更新頭像
+     */
+    public function avatar(Request $request)
+    {
+        $user = $request->user();
+        if ($user && !empty($user->access_token)) {
+            $response = Http::withHeaders([
+                'Authorization' => sprintf('Bearer %s', $user->access_token),
+            ])->get(env('OAUTH_API_URL') . '/user');
+
+            $res = $response->json();
+            $user->avatar = Arr::get($res, 'avatar', '');
+            $user->save();
         }
 
-        return view('home');
+        return redirect('/home');
     }
 
     /**
      * 收到 Oauth server 的 callback 之後
      * 更新 User 的 token 欄位
      */
-    public function callback(Request $request) {
+    public function callback(Request $request)
+    {
         $response = Http::asForm()->post(env('OAUTH_GET_TOKEN_URL'), [
             'grant_type' => 'authorization_code',
             'client_id' => env('OAUTH_CLIENT_ID'),
@@ -48,10 +62,13 @@ class HomeController extends Controller
         ]);
 
         $res = $response->json();
+        // dd($res);
+
         $user = $request->user();
         $user->access_token = Arr::get($res, 'access_token', '');
         $user->refresh_token = Arr::get($res, 'refresh_token', '');
         $user->save();
+        // dd($user);
     
         return redirect('/home');
     }

@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
@@ -46,4 +46,5 @@ Route::get('refresh', function (Request $request) {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/avatar', [App\Http\Controllers\HomeController::class, 'avatar'])->name('avatar');
 Route::get('/callback', [App\Http\Controllers\HomeController::class, 'callback'])->name('callback');
