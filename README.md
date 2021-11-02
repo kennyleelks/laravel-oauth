@@ -76,6 +76,12 @@
     Client ID: 1
     Client secret: 5XBUxR0CoStBFrOkHHcaARSoI15DvJJmxGVfrTPq
     ```
+1. 編修 routes/api.php
+    ```php
+    Route::middleware('auth:api')->get('/user', function (Request $request) {
+        return $request->user(); // 取得當前登入的 User 資料
+    });
+    ```
 
 ## Step 2: 初始化 Client
 
