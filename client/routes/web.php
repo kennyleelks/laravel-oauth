@@ -22,21 +22,21 @@ Route::get('/', function () {
 
 Route::get('/redirect', function (Request $request) {
     $query = http_build_query([
-        'client_id' => '3',
-        'redirect_uri' => 'http://127.0.0.1:8081/callback',
+        'client_id' => env('OAUTH_CLIENT_ID'),
+        'redirect_uri' => env('OAUTH_CALLBACK_URL'),
         'response_type' => 'code',
         'scope' => '',
     ]);
 
-    return redirect('http://127.0.0.1:8080/oauth/authorize?'.$query);
+    return redirect(env('OAUTH_AUTHORIZE_URL') . '?' . $query);
 });
 
 Route::get('callback', function (Request $request) {
-    $response = Http::asForm()->post('http://docker.for.mac.localhost:8080/oauth/token', [
+    $response = Http::asForm()->post(env('OAUTH_GET_TOKEN_URL'), [
         'grant_type' => 'authorization_code',
-        'client_id' => '3',
-        'client_secret' => 'H1B9oIGePEfOZtDnExGmxTzIUnmdoy71oM5h4GW0',
-        'redirect_uri' => 'http://127.0.0.1:8081/callback',
+        'client_id' => env('OAUTH_CLIENT_ID'),
+        'client_secret' => env('OAUTH_CLIENT_SECRET'),
+        'redirect_uri' => env('OAUTH_CALLBACK_URL'),
         'code' => $request->code,
     ]);
 
@@ -44,11 +44,11 @@ Route::get('callback', function (Request $request) {
 });
 
 Route::get('refresh', function (Request $request) {
-    $response = Http::asForm()->post('http://docker.for.mac.localhost:8080/oauth/token', [
+    $response = Http::asForm()->post(env('OAUTH_GET_TOKEN_URL'), [
         'grant_type' => 'refresh_token',
         'refresh_token' => $request->token,
-        'client_id' => '3',
-        'client_secret' => 'H1B9oIGePEfOZtDnExGmxTzIUnmdoy71oM5h4GW0',
+        'client_id' => env('OAUTH_CLIENT_ID'),
+        'client_secret' => env('OAUTH_CLIENT_SECRET'),
         'scope' => '',
     ]);
 
