@@ -21,6 +21,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+
+        // 使這些欄位可以被寫入
+        'access_token',
+        'refresh_token',
+        'avatar',
     ];
 
     /**
@@ -31,6 +36,10 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        
+        // 避免 token 意外洩漏
+        'access_token',
+        'refresh_token',
     ];
 
     /**

@@ -20,6 +20,9 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->text('access_token');  // 新增: Access token
+            $table->text('refresh_token'); // 新增: Refresh token
+            $table->text('avatar');        // 新增: 頭像網址
             $table->timestamps();
         });
     }

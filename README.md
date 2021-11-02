@@ -82,9 +82,108 @@
         return $request->user(); // 取得當前登入的 User 資料
     });
     ```
+1. 編修 app/Models/User.php
+    ```php
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['avatar'];
+
+    /**
+     * 回傳大頭照
+     */
+    public function getAvatarAttribute() {
+        return sprintf("https://avatars.dicebear.com/api/human/%s.svg", $this->id);
+    }
+    ```
 
 ## Step 2: 初始化 Client
 
+1. 確認已經安裝 Laravel UI，用來產生預設登入、註冊頁面
+    ```console
+    $ composer require laravel/ui
+    $ php artisan ui vue --auth
+    $ npm install && npm run dev
+    ```
+1. 編修 database/migrations/xxxx_xx_xx_xxxxxx_create_users_table.php
+    ```php
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->rememberToken();
+            $table->text('access_token');   // 新增: Access token
+            $table->text('refresh_token');  // 新增: Refresh token
+            $table->text('avatar');         // 新增: 頭像網址
+            $table->timestamps();
+        });
+    }
+    ```
+1. 編修 app/Models/User.php
+    ```php
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var string[]
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+
+        // 使這些欄位可以被寫入
+        'access_token',
+        'refresh_token',
+        'avatar',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+
+        // 避免 token 意外洩漏
+        'access_token',
+        'refresh_token',
+    ];
+    ```
+1. 編修 app/Http/Controllers/Auth/RegisterController.php
+    ```php
+    /**
+     * Create a new user instance after a valid registration.
+     *
+     * @param  array  $data
+     * @return \App\Models\User
+     */
+    protected function create(array $data)
+    {
+        return User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+
+            // 註冊用戶時，填入空值
+            'access_token' => '',
+            'refresh_token' => '',
+            'avatar' => '',
+        ]);
+    }
+    ```
 1. 建立所需資料表
     ```console
     $ php artisan migrate
